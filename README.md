@@ -1,2 +1,3 @@
-# tanzu-poc
-Simple Tanzu PoC tests
+# Unofficial Tanzu PoC Guide
+
+This is repository for 
