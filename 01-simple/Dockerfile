@@ -1,4 +1,4 @@
-FROM nginx:1.21.4-alpine
+FROM nginx:1.21.5-alpine
 
 LABEL maintainer="DevUlrix"
 LABEL org.opencontainers.image.source https://github.com/devulrix/tanzu-poc
