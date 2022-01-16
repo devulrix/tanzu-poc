@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  simple-app
+  namespace: tanzu-test-01
+  labels:
+    app:  simple-app
+spec:
+  selector:
+    matchLabels:
+      app: simple-app
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app:  simple-app
+    spec:
+      serviceAccountName: tanzu-test-01-sa
+      containers:
+      - name:  simple-app
+        image:  ulrix/simple-app:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 10m
+            memory: 24Mi
+          limits:
+            cpu: 100m
+            memory: 32Mi
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 10
+        ports:
+        - containerPort:  80
+          name:  simple-app
+      imagePullSecrets:
+      - name: regcred
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-app
+  namespace: tanzu-test-01
+spec:
+  selector:
+    app: simple-app
+  type: LoadBalancer
+  ports:
+  - name: simple-app
+    protocol: TCP
+    port: 80
+    targetPort: 80 
