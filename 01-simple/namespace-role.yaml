@@ -15,9 +15,9 @@ metadata:
   name: tanzu-test-01-role
   namespace: tanzu-test-01
 rules:
-- apiGroups: ["*"]
-  resources: ["pods"]
-  verbs: ["get","list","watch","create","update","patch","delete"]
+- apiGroups: ["apps","extensions","policy"]
+  resources: ["pods","deployments","podsecuritypolicies"]
+  verbs: ["get","list","watch","create","update","patch","delete","use"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
