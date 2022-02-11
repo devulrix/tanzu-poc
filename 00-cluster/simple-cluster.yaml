@@ -1,0 +1,22 @@
+apiVersion: run.tanzu.vmware.com/v1alpha2
+kind: TanzuKubernetesCluster
+metadata:
+  name: tkc-test
+  namespace: customer
+spec:
+  topology:
+    controlPlane:
+      replicas: 1
+      vmClass: best-effort-xsmall
+      storageClass: tanzu-storage
+      tkr:  
+        reference:
+          name: v1.21.2---vmware.1-tkg.1.ee25d55
+    nodePools:
+    - name: workerpool-1
+      replicas: 1
+      vmClass: best-effort-xsmall
+      storageClass: tanzu-storage
+      tkr:  
+        reference:
+          name: v1.21.2---vmware.1-tkg.1.ee25d55
