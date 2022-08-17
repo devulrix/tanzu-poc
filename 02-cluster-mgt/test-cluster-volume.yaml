@@ -1,0 +1,30 @@
+apiVersion: run.tanzu.vmware.com/v1alpha2
+kind: TanzuKubernetesCluster
+metadata:
+  name: simple-cluster
+  namespace: tkc-test
+spec:
+  topology:
+    controlPlane:
+      replicas: 1
+      vmClass: best-effort-small
+      storageClass: tanzu-storage
+      tkr:  
+        reference:
+          name: v1.21.2---vmware.1-tkg.1.ee25d55
+    nodePools:
+    - name: workerpool-1
+      replicas: 3
+      vmClass: best-effort-medium
+      storageClass: tanzu-storage
+      volumes:
+        - name: containerd
+          mountPath: /var/lib/containerd
+          capacity:
+            storage: 25Gi
+      tkr:  
+        reference:
+          name: v1.21.2---vmware.1-tkg.1.ee25d55
+  settings:
+    storage:
+      defaultClass: tanzu-storage
