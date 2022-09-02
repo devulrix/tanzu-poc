@@ -11,7 +11,6 @@ If you have TMC (Tanzu Mission Controll) available please use the [Catalog featu
   - [Setup kapp-controller and secretgen-controller](#setup-kapp-controller-and-secretgen-controller)
   - [Cert-manager](#cert-manager)
   - [Contour](#contour)
-  - [Harbor](#harbor)
 
 ## Background
 
@@ -105,6 +104,3 @@ The envoy installation will fail with the *vmware-system-restricted* psp so we n
 kubectl apply -f contour/contour-psp.yaml
 kubectl apply -f contour/contour-package-install.yaml
 ```
-
-## Harbor
-
