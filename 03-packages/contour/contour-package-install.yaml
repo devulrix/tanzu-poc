@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tanzu-package-contour-sa
+  namespace: tanzu-packages
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tanzu-package-contour-role
+rules:
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - issuers
+  - certificates
+  verbs:
+  - get
+  - list
+  - use
+  - create
+  - update
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - "*"
+- apiGroups:
+  - "apps"
+  resources:
+  - deployments
+  - daemonsets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - use
+  - create
+  - delete
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - "*"
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - "*"
+- apiGroups:
+  - policy
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - vmware-system-restricted
+  - tanzu-system-envoy-restricted
+  verbs:
+  - use
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tanzu-package-contour-clusterrole-binding
+subjects:
+- kind: ServiceAccount
+  name: tanzu-package-contour-sa
+  namespace: tanzu-packages
+roleRef:
+  kind: ClusterRole
+  name: tanzu-package-contour-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/tanzu-package: contour-packages
+  name: contour-packages-values
+  namespace: tanzu-packages
+type: Opaque
+data:
+  contour.yaml: LS0tCmluZnJhc3RydWN0dXJlX3Byb3ZpZGVyOiB2c3BoZXJlCm5hbWVzcGFjZTogdGFuenUtc3lzdGVtLWluZ3Jlc3MKY29udG91cjoKIGNvbmZpZ0ZpbGVDb250ZW50czoge30KIHVzZVByb3h5UHJvdG9jb2w6IGZhbHNlCiByZXBsaWNhczogMgogcHNwTmFtZXM6ICJ2bXdhcmUtc3lzdGVtLXJlc3RyaWN0ZWQiCiBsb2dMZXZlbDogaW5mbwplbnZveToKIHNlcnZpY2U6CiAgIHR5cGU6IExvYWRCYWxhbmNlcgogICBhbm5vdGF0aW9uczoge30KICAgbm9kZVBvcnRzOgogICAgIGh0dHA6IG51bGwKICAgICBodHRwczogbnVsbAogICBleHRlcm5hbFRyYWZmaWNQb2xpY3k6IENsdXN0ZXIKICAgZGlzYWJsZVdhaXQ6IGZhbHNlCiBob3N0UG9ydHM6CiAgIGVuYWJsZTogdHJ1ZQogICBodHRwOiA4MAogICBodHRwczogNDQzCiBob3N0TmV0d29yazogZmFsc2UKIHRlcm1pbmF0aW9uR3JhY2VQZXJpb2RTZWNvbmRzOiAzMDAKIGxvZ0xldmVsOiBpbmZvCiBwc3BOYW1lczogInRhbnp1LXN5c3RlbS1lbnZveS1yZXN0cmljdGVkIgpjZXJ0aWZpY2F0ZXM6CiBkdXJhdGlvbjogODc2MGgKIHJlbmV3QmVmb3JlOiAzNjBo
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: contour
+  namespace: tanzu-packages
+spec:
+  serviceAccountName: tanzu-package-contour-sa
+  packageRef:
+    refName: contour.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.18.2+vmware.1-tkg.1
+  values:
+  - secretRef:
+      name: contour-packages-values
