@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-packages-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: cert-manager
+  namespace: cert-manager
+roleRef:
+  kind: ClusterRole
+  name: tanzu-packages-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-cainjector-packages-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: cert-manager-cainjector
+  namespace: cert-manager
+roleRef:
+  kind: ClusterRole
+  name: tanzu-packages-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cert-manager-webhook-packages-cluster-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: cert-manager-webhook
+  namespace: cert-manager
+roleRef:
+  kind: ClusterRole
+  name: tanzu-packages-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: cert-manager
+  namespace: tanzu-packages
+spec:
+  packageRef:
+    refName: cert-manager.tanzu.vmware.com
+    versionSelection:
+      constraints: 1.5.3+vmware.2-tkg.1
+  serviceAccountName: tanzu-packages-sa

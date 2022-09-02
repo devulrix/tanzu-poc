@@ -1,0 +1,29 @@
+apiVersion: run.tanzu.vmware.com/v1alpha2
+kind: TanzuKubernetesCluster
+metadata:
+  name: shared-tools
+spec:
+  topology:
+    controlPlane:
+      replicas: 1
+      vmClass: best-effort-small
+      storageClass: tanzu-storage
+      tkr:  
+        reference:
+          name: v1.22.9---vmware.1-tkg.1.cc71bc8
+    nodePools:
+    - name: workerpool-1
+      replicas: 1
+      vmClass: best-effort-medium
+      storageClass: tanzu-storage
+      tkr:  
+        reference:
+          name: v1.22.9---vmware.1-tkg.1.cc71bc8
+      volumes:
+        - name: containerd
+          mountPath: /var/lib/containerd
+          capacity:
+            storage: 25Gi
+  settings:
+    storage:
+      defaultClass: tanzu-storage
