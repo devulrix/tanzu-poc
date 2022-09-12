@@ -1,0 +1,81 @@
+namespace: harbor
+hostname: harbor2.lab.uhtec.com
+port:
+  https: 443
+logLevel: info
+enableContourHttpProxy: true
+harborAdminPassword: VMware1!
+secretKey: M2blh8iIZIWL9Kvv
+database:
+  password: 0ZuG0STKmHYAs3aE
+core:
+  replicas: 1
+  secret: jML4MAuLIEgOFmq8
+  xsrfKey: ZcEYnGlUSBJvP7jrf9zKuZh4OFoNfIUQ
+jobservice:
+  replicas: 1
+  secret: 6TW3Ylpg8LpYjixp
+registry:
+  replicas: 1
+  secret: Ee48fjRlkMm4n2l6
+notary:
+  enabled: true
+tlsCertificateSecretName: harbor-tls
+trivy:
+  enabled: true
+  replicas: 1
+  gitHubToken: "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"
+  skipUpdate: false
+persistence:
+  persistentVolumeClaim:
+    registry:
+      existingClaim: ""
+      storageClass: "tanzu-storage"
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 100Gi
+    jobservice:
+      existingClaim: ""
+      storageClass: "tanzu-storage"
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    database:
+      existingClaim: ""
+      storageClass: "tanzu-storage"
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    redis:
+      existingClaim: ""
+      storageClass: "tanzu-storage"
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 1Gi
+    trivy:
+      existingClaim: ""
+      storageClass: "tanzu-storage"
+      subPath: ""
+      accessMode: ReadWriteOnce
+      size: 5Gi
+  imageChartStorage:
+    disableredirect: false
+    type: filesystem
+    filesystem:
+      rootdirectory: /storage
+proxy:
+  httpProxy:
+  httpsProxy:
+  noProxy: 127.0.0.1,localhost,.local,.internal
+pspNames: vmware-system-restricted
+metrics:
+  enabled: true
+  core:
+    path: /metrics
+    port: 8001
+  registry:
+    path: /metrics
+    port: 8001
+  exporter:
+    path: /metrics
+    port: 8001

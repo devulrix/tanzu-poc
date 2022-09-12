@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tanzu-package-harbor-sa
+  namespace: tanzu-packages
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tanzu-package-harbor-role
+rules:
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - issuers
+  - certificates
+  verbs:
+  - get
+  - list
+  - use
+  - create
+  - update
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - "*"
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclass
+  verbs:
+  - "list"
+  - "use"
+  - "get"
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - peristenvolumes
+  verbs:
+  - "*"
+- apiGroups:
+  - "apps"
+  resources:
+  - deployments
+  - statefulsets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - use
+  - create
+  - delete
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - "*"
+- apiGroups:
+  - "projectcontour.io"
+  resources:
+  - httpproxies
+  verbs:
+  - get
+  - create
+  - update
+  - delete
+  - use
+- apiGroups:
+  - policy
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - vmware-system-restricted
+  verbs:
+  - use
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tanzu-package-harbor-clusterrole-binding
+subjects:
+- kind: ServiceAccount
+  name: tanzu-package-harbor-sa
+  namespace: tanzu-packages
+roleRef:
+  kind: ClusterRole
+  name: tanzu-package-harbor-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: harbor-packages-values
+  namespace: tanzu-packages
+type: Opaque
+data:
+  harbor.yaml: bmFtZXNwYWNlOiBoYXJib3IKaG9zdG5hbWU6IGhhcmJvcjIubGFiLnVodGVjLmNvbQpwb3J0OgogIGh0dHBzOiA0NDMKbG9nTGV2ZWw6IGluZm8KZW5hYmxlQ29udG91ckh0dHBQcm94eTogdHJ1ZQpoYXJib3JBZG1pblBhc3N3b3JkOiBWTXdhcmUxIQpzZWNyZXRLZXk6IE0yYmxoOGlJWklXTDlLdnYKZGF0YWJhc2U6CiAgcGFzc3dvcmQ6IDBadUcwU1RLbUhZQXMzYUUKY29yZToKICByZXBsaWNhczogMQogIHNlY3JldDogak1MNE1BdUxJRWdPRm1xOAogIHhzcmZLZXk6IFpjRVluR2xVU0JKdlA3anJmOXpLdVpoNE9Gb05mSVVRCmpvYnNlcnZpY2U6CiAgcmVwbGljYXM6IDEKICBzZWNyZXQ6IDZUVzNZbHBnOExwWWppeHAKcmVnaXN0cnk6CiAgcmVwbGljYXM6IDEKICBzZWNyZXQ6IEVlNDhmalJsa01tNG4ybDYKbm90YXJ5OgogIGVuYWJsZWQ6IHRydWUKdGxzQ2VydGlmaWNhdGVTZWNyZXROYW1lOiBoYXJib3ItdGxzCnRyaXZ5OgogIGVuYWJsZWQ6IHRydWUKICByZXBsaWNhczogMQogIGdpdEh1YlRva2VuOiAiZ2hwX0RnZndrZ2VxZ2djSDNOOU5ldmt3SG8wb3RNNWFwaDBvbzh3MSIKICBza2lwVXBkYXRlOiBmYWxzZQpwZXJzaXN0ZW5jZToKICBwZXJzaXN0ZW50Vm9sdW1lQ2xhaW06CiAgICByZWdpc3RyeToKICAgICAgZXhpc3RpbmdDbGFpbTogIiIKICAgICAgc3RvcmFnZUNsYXNzOiAidGFuenUtc3RvcmFnZSIKICAgICAgc3ViUGF0aDogIiIKICAgICAgYWNjZXNzTW9kZTogUmVhZFdyaXRlT25jZQogICAgICBzaXplOiAxMDBHaQogICAgam9ic2VydmljZToKICAgICAgZXhpc3RpbmdDbGFpbTogIiIKICAgICAgc3RvcmFnZUNsYXNzOiAidGFuenUtc3RvcmFnZSIKICAgICAgc3ViUGF0aDogIiIKICAgICAgYWNjZXNzTW9kZTogUmVhZFdyaXRlT25jZQogICAgICBzaXplOiAxR2kKICAgIGRhdGFiYXNlOgogICAgICBleGlzdGluZ0NsYWltOiAiIgogICAgICBzdG9yYWdlQ2xhc3M6ICJ0YW56dS1zdG9yYWdlIgogICAgICBzdWJQYXRoOiAiIgogICAgICBhY2Nlc3NNb2RlOiBSZWFkV3JpdGVPbmNlCiAgICAgIHNpemU6IDFHaQogICAgcmVkaXM6CiAgICAgIGV4aXN0aW5nQ2xhaW06ICIiCiAgICAgIHN0b3JhZ2VDbGFzczogInRhbnp1LXN0b3JhZ2UiCiAgICAgIHN1YlBhdGg6ICIiCiAgICAgIGFjY2Vzc01vZGU6IFJlYWRXcml0ZU9uY2UKICAgICAgc2l6ZTogMUdpCiAgICB0cml2eToKICAgICAgZXhpc3RpbmdDbGFpbTogIiIKICAgICAgc3RvcmFnZUNsYXNzOiAidGFuenUtc3RvcmFnZSIKICAgICAgc3ViUGF0aDogIiIKICAgICAgYWNjZXNzTW9kZTogUmVhZFdyaXRlT25jZQogICAgICBzaXplOiA1R2kKICBpbWFnZUNoYXJ0U3RvcmFnZToKICAgIGRpc2FibGVyZWRpcmVjdDogZmFsc2UKICAgIHR5cGU6IGZpbGVzeXN0ZW0KICAgIGZpbGVzeXN0ZW06CiAgICAgIHJvb3RkaXJlY3Rvcnk6IC9zdG9yYWdlCnByb3h5OgogIGh0dHBQcm94eToKICBodHRwc1Byb3h5OgogIG5vUHJveHk6IDEyNy4wLjAuMSxsb2NhbGhvc3QsLmxvY2FsLC5pbnRlcm5hbApwc3BOYW1lczogdm13YXJlLXN5c3RlbS1yZXN0cmljdGVkCm1ldHJpY3M6CiAgZW5hYmxlZDogdHJ1ZQogIGNvcmU6CiAgICBwYXRoOiAvbWV0cmljcwogICAgcG9ydDogODAwMQogIHJlZ2lzdHJ5OgogICAgcGF0aDogL21ldHJpY3MKICAgIHBvcnQ6IDgwMDEKICBleHBvcnRlcjoKICAgIHBhdGg6IC9tZXRyaWNzCiAgICBwb3J0OiA4MDAx
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: harbor-overlay-secret
+  namespace: tanzu-packages
+stringData:
+  ztanzu-package-harbor.yaml: |
+    #@ load("@ytt:overlay", "overlay")
+    #@overlay/match by=overlay.subset({"metadata":{"name":"harbor-trivy"}}), expects="1+"
+    ---
+    spec:
+      template:
+        spec:
+          containers:
+            #@overlay/match by="name"
+            - name: trivy
+              env:
+                #@overlay/match by="name"
+                - name: SCANNER_TRIVY_IGNORE_UNFIXED
+                  value: true
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: harbor
+  namespace: tanzu-packages
+  # annotations:
+  #   ext.packaging.carvel.dev/ytt-paths-from-secret-name.0: harbor-overlay-secret
+spec:
+  serviceAccountName: tanzu-package-harbor-sa
+  packageRef:
+    refName: harbor.tanzu.vmware.com
+    versionSelection:
+      constraints: 2.3.3+vmware.1-tkg.1
+  values:
+  - secretRef:
+      name: harbor-packages-values

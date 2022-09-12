@@ -1,0 +1,13 @@
+#@ load("@ytt:overlay", "overlay")
+#@overlay/match by=overlay.subset({"metadata": {"name": "harbor-trivy"}}),expects="1+"
+---
+spec:
+  template:
+    spec:
+      containers:
+        #@overlay/match by="name"
+        - name: trivy
+          env:
+            #@overlay/match by="name"
+            - name: "SCANNER_TRIVY_IGNORE_UNFIXED"
+              value: true
