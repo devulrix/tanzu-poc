@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tanzu-system-service-discovery
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tanzu-package-external-dns-sa
+  namespace: tanzu-packages
+---
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tanzu-package-external-dns-role
+rules:
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - "*"
+- apiGroups:
+  - "apps"
+  resources:
+  - deployments
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - "*"
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - "*"
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - "*"
+- apiGroups:
+  - policy
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - vmware-system-restricted
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tanzu-package-external-dns-clusterrole-binding
+subjects:
+- kind: ServiceAccount
+  name: tanzu-package-external-dns-sa
+  namespace: tanzu-packages
+roleRef:
+  kind: ClusterRole
+  name: tanzu-package-contour-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-dns-packages-values
+  namespace: tanzu-packages
+type: Opaque
+data:
+  external-dns.yaml: LS0tCgpuYW1lc3BhY2U6IHRhbnp1LXN5c3RlbS1zZXJ2aWNlLWRpc2NvdmVyeQoKZGVwbG95bWVudDoKIGFyZ3M6CiAgIC0gLS1zb3VyY2U9c2VydmljZQogICAtIC0tc291cmNlPWluZ3Jlc3MKICAgLSAtLXNvdXJjZT1jb250b3VyLWh0dHBwcm94eSAKICAgLSAtLWRvbWFpbi1maWx0ZXI9bGFiLnVodGVjLmNvbSAKICAgLSAtLXJlZ2lzdHJ5PXR4dAogICAtIC0tdHh0LW93bmVyLWlkPXh4eHh4eHgKICAgLSAtLXR4dC1wcmVmaXg9dHh0IAogICAtIC0tcHJvdmlkZXI9YXdzCiAgIC0gLS1hd3Mtem9uZS10eXBlPXB1YmxpYwogICAtIC0tYXdzLXByZWZlci1jbmFtZQogZW52OgogICAtIG5hbWU6IEFXU19BQ0NFU1NfS0VZX0lECiAgICAgdmFsdWVGcm9tOgogICAgICAgc2VjcmV0S2V5UmVmOgogICAgICAgICBuYW1lOiByb3V0ZTUzLWNyZWRlbnRpYWxzCiAgICAgICAgIGtleTogYXdzX2FjY2Vzc19rZXlfaWQKICAgLSBuYW1lOiBBV1NfU0VDUkVUX0FDQ0VTU19LRVkKICAgICB2YWx1ZUZyb206CiAgICAgICBzZWNyZXRLZXlSZWY6CiAgICAgICAgIG5hbWU6IHJvdXRlNTMtY3JlZGVudGlhbHMKICAgICAgICAga2V5OiBhd3Nfc2VjcmV0X2FjY2Vzc19rZXkKIHNlY3VyaXR5Q29udGV4dDoge30KIHZvbHVtZU1vdW50czogW10KIHZvbHVtZXM6IFtd
+---
+apiVersion: v1
+data:
+  aws_access_key_id: xxx
+  aws_secret_access_key: xxx
+kind: Secret
+metadata:
+  name: route53-credentials
+  namespace: tanzu-system-service-discovery
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: external-dns-overlay-secret
+  namespace: tanzu-packages
+stringData:
+  external-dns.yaml: |
+    #@ load("@ytt:overlay", "overlay")
+    #@overlay/match by=overlay.subset({"kind":"ClusterRole"}), expects=1
+    ---
+    rules:
+    #@overlay/append
+    - apiGroups: ["policy"]
+      resources: ["podsecuritypolicies"]
+      resourceNames: ["vmware-system-restricted"]
+      verbs: ["use"]
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: external-dns
+  namespace: tanzu-packages
+  annotations:
+     ext.packaging.carvel.dev/ytt-paths-from-secret-name.0: external-dns-overlay-secret
+spec:
+  packageRef:
+    refName: external-dns.tanzu.vmware.com
+    versionSelection:
+      constraints: 0.10.0+vmware.1-tkg.1
+  serviceAccountName: tanzu-package-external-dns-sa
+  values:
+  - secretRef:
+      name: external-dns-packages-values

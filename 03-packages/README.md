@@ -11,6 +11,7 @@ If you have TMC (Tanzu Mission Controll) available please use the [Catalog featu
   - [Setup kapp-controller and secretgen-controller](#setup-kapp-controller-and-secretgen-controller)
   - [Cert-manager](#cert-manager)
   - [Contour](#contour)
+  - [External DNS](#external-dns)
 
 ## Background
 
@@ -104,3 +105,9 @@ The envoy installation will fail with the *vmware-system-restricted* psp so we n
 kubectl apply -f contour/contour-psp.yaml
 kubectl apply -f contour/contour-package-install.yaml
 ```
+
+## External DNS
+
+Please prepare the [config file](external-dns/config.yaml) for your DNS provider e.g. AWS Route 53, BIND, Microsoft Azure. The example files can be found in the [Tanzu Packages documentation](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid/1.5/vmware-tanzu-kubernetes-grid-15/GUID-packages-external-dns.html).
+
+Before you base 64 encode your

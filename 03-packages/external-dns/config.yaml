@@ -1,0 +1,35 @@
+---
+
+namespace: tanzu-system-service-discovery
+
+deployment:
+ args:
+   - --source=service
+   - --source=ingress
+   - --source=contour-httpproxy 
+   - --domain-filter=DOMAIN 
+   - --policy=upsert-only 
+   - --registry=txt
+   - --txt-owner-id=HOSTED-ZONE-ID
+   - --txt-prefix=txt 
+   - --provider=aws
+   - --aws-zone-type=public
+   - --aws-prefer-cname
+ env:
+   - name: AWS_ACCESS_KEY_ID
+     valueFrom:
+       secretKeyRef:
+         name: route53-credentials
+         key: aws_access_key_id
+   - name: AWS_SECRET_ACCESS_KEY
+     valueFrom:
+       secretKeyRef:
+         name: route53-credentials
+         key: aws_secret_access_key
+ securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop: ["ALL"]
+ volumeMounts: []
+ volumes: []
