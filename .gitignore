@@ -24,3 +24,9 @@ hs_err_pid*
 
 # ignore the Mac folder
 .DS_Store
+
+# remove temp folder for package inspection
+temp*
+
+# remove secrets 
+*secret.yaml
