@@ -24,7 +24,7 @@ tlsCertificateSecretName: harbor-tls
 trivy:
   enabled: true
   replicas: 1
-  gitHubToken: "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"
+  gitHubToken: "xxxx"
   skipUpdate: false
 persistence:
   persistentVolumeClaim:

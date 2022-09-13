@@ -1,0 +1,16 @@
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: harbor
+  namespace: tanzu-packages
+  # annotations:
+  #   ext.packaging.carvel.dev/ytt-paths-from-secret-name.0: harbor-overlay-secret
+spec:
+  serviceAccountName: tanzu-package-harbor-sa
+  packageRef:
+    refName: harbor.tanzu.vmware.com
+    versionSelection:
+      constraints: 2.3.3+vmware.1-tkg.1
+  values:
+  - secretRef:
+      name: harbor-packages-values
