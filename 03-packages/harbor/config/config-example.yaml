@@ -20,11 +20,10 @@ registry:
   secret: Ee48fjRlkMm4n2l6
 notary:
   enabled: true
-tlsCertificateSecretName: harbor-tls
 trivy:
   enabled: true
   replicas: 1
-  gitHubToken: "xxxx"
+  gitHubToken: ""
   skipUpdate: false
 persistence:
   persistentVolumeClaim:
