@@ -1,0 +1,16 @@
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageInstall
+metadata:
+  name: prometheus
+  namespace: tanzu-packages
+  annotations:
+     ext.packaging.carvel.dev/ytt-paths-from-secret-name.0: prometheus-overlay-secret
+spec:
+  serviceAccountName: tanzu-package-prometheus-sa
+  packageRef:
+    refName: prometheus.tanzu.vmware.com
+    versionSelection:
+      constraints: 2.27.0+vmware.2-tkg.1
+  values:
+  - secretRef:
+      name: prometheus-packages-values

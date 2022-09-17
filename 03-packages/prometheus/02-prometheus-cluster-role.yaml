@@ -1,0 +1,146 @@
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tanzu-package-prometheus-role
+rules:
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - issuers
+  - certificates
+  verbs:
+  - get
+  - list
+  - use
+  - create
+  - update
+- apiGroups:
+  - "projectcontour.io"
+  resources:
+  - httpproxies
+  verbs:
+  - get
+  - create
+  - update
+  - delete
+  - use
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs:
+  - get
+  - use
+  - create
+  - update
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - storageclass
+  verbs:
+  - "list"
+  - "use"
+  - "get"
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - peristenvolumes
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - "apps"
+  resources:
+  - deployments
+  - daemonsets
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - use
+  - create
+  - delete
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - use
+  - create
+  - update
+  - list
+  - delete
+- apiGroups:
+  - policy
+  resources:
+  - podsecuritypolicies
+  resourceNames:
+  - vmware-system-restricted
+  - prometheus-node-exporter
+  verbs:
+  - use
+  - get
