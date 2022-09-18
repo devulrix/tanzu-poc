@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-packages-values
+  namespace: tanzu-packages
+type: Opaque
+data:
+  grafana.yaml: aW5ncmVzczoKICBlbmFibGVkOiB0cnVlCiAgcHJlZml4OiAvCiAgc2VydmljZVBvcnQ6IDgwCiAgdmlydHVhbF9ob3N0X2ZxZG46IGdyYWZhbmEyLmxhYi51aHRlYy5jb20Kc2VjcmV0OgogIGFkbWluX3Bhc3N3b3JkOiBWazEzWVhKbE1TRT0KcHZjOgogIHN0b3JhZ2VDbGFzc05hbWU6IHRhbnp1LXN0b3JhZ2U=

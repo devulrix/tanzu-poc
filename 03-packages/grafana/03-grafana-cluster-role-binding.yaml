@@ -1,0 +1,13 @@
+# https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tanzu-package-grafana-clusterrole-binding
+subjects:
+- kind: ServiceAccount
+  name: tanzu-package-grafana-sa
+  namespace: tanzu-packages
+roleRef:
+  kind: ClusterRole
+  name: tanzu-package-grafana-role
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,9 @@
+ingress:
+  enabled: true
+  prefix: /
+  servicePort: 80
+  virtual_host_fqdn: grafana2.lab.uhtec.com
+secret:
+  admin_password: Vk13YXJlMSE=
+pvc:
+  storageClassName: tanzu-storage
