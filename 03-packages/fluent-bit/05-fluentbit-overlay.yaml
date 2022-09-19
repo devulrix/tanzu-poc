@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fluentbit-overlay-secret
+  namespace: tanzu-packages
+stringData:
+  fluentbit-overlay.yaml: |
+    #@ load("@ytt:overlay", "overlay")
+
+    #@overlay/match by=overlay.subset({"kind":"ClusterRole", "metadata":{"name":"fluent-bit-read"}})
+    ---
+    rules:
+    - apiGroups: ['policy']
+      resources: ['podsecuritypolicies']
+      verbs:     ['use']
+      resourceNames:
+      - fluent-bit-restricted
