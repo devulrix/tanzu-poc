@@ -46,10 +46,35 @@ rules:
   - "use"
   - "get"
 - apiGroups:
+    - ""
+  resources:
+  - events
+  - nodes
+  - nodes/stats
+  - nodes/metrics
+  - nodes/proxy
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  resources:
+  - deployments
+  - daemonsets
+  - ingresses
+  - replicasets
+  - ingresses/status
+  verbs:
+  - get
+  - list
+  - watch
+  - list
+- apiGroups:
   - ""
   resources:
   - persistentvolumeclaims
-  - peristenvolumes
+  - persistentvolumes
   verbs:
   - get
   - use
@@ -57,6 +82,7 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - "apps"
   resources:
@@ -69,6 +95,7 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -80,6 +107,112 @@ rules:
   - update
   - list
   - delete
+  - watch
+- apiGroups:
+  - "" 
+  resources:
+  - endpoints
+  verbs:
+  - watch
+  - list
+  - get
+- apiGroups:
+  - "" 
+  resources:
+  - ingresses
+  verbs:
+  - watch
+  - list
+  - get
+- apiGroups:
+  - "" 
+  resources:
+  - limitranges
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "" 
+  resources:
+  - replicationcontrollers
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "" 
+  resources:
+  - resourcequotas
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "admissionregistration.k8s.io" 
+  resources:
+  - mutatingwebhookconfigurations
+  - validatingwebhookconfigurations
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "apps" 
+  resources:
+  - replicasets
+  - statefulsets
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - "autoscaling" 
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "batch" 
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "certificates.k8s.io" 
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - watch
+  - list
+- nonResourceURLs:
+  - "/metrics"
+  verbs:
+  - get
+- apiGroups:
+  - "networking.k8s.io" 
+  resources:
+  - networkpolicies
+  - ingresses
+  - ingresses/status
+  verbs:
+  - watch
+  - list
+  - get
+- apiGroups:
+  - "policy" 
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - watch
+  - list
+- apiGroups:
+  - "storage.k8s.io" 
+  resources:
+  - storageclasses
+  - volumeattachments
+  verbs:
+  - watch
+  - list
 - apiGroups:
   - ""
   resources:
@@ -91,6 +224,7 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -102,6 +236,7 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -123,6 +258,7 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -134,13 +270,23 @@ rules:
   - update
   - list
   - delete
+  - watch
 - apiGroups:
   - policy
   resources:
   - podsecuritypolicies
-  resourceNames:
-  - vmware-system-restricted
-  - prometheus-node-exporter
+  # resourceNames:
+  # - vmware-system-restricted
+  # - prometheus-node-exporter
   verbs:
   - use
   - get
+  - update
+- apiGroups:
+    - ""
+  resources:
+    - podsecuritypolicies
+  resourceNames:
+    - "node-exporter"
+  verbs:
+    - use
