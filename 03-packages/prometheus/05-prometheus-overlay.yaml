@@ -16,3 +16,12 @@ stringData:
             - name: alertmanager
               args:
                 - --cluster.listen-address=
+
+    #@overlay/match by=overlay.subset({"kind":"ClusterRole", "metadata":{"name":"prometheus-node-exporter"}})
+    ---
+    rules:
+    - apiGroups: ['policy']
+      resources: ['podsecuritypolicies']
+      verbs:     ['use']
+      resourceNames:
+      - prometheus-node-exporter
